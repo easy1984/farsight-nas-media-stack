@@ -67,7 +67,8 @@ services:
   jellyfin:
     image: lscr.io/linuxserver/jellyfin:latest
     container_name: jellyfin
-    network_mode: host
+    ports:
+      - 8096:8096
     environment:
       - PUID=$PUID
       - PGID=$PGID
