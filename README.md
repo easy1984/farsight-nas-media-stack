@@ -30,7 +30,7 @@
 使用這個腳本非常簡單！只需要透過 SSH 連線到你的 NAS 終端機，然後複製並貼上這條命令，按 Enter 即可。
 
 ```bash
-curl -fsSL https://github.com/easy1984/farsight-nas-media-stack/edit/main/fnserver.sh -o fnserver.sh &&  chmod +x fnserver.sh &&  ./fnserver.sh
+curl -fsSL https://raw.githubusercontent.com/easy1984/farsight-nas-media-stack/edit/main/fnserver.sh -o fnserver.sh &&  chmod +x fnserver.sh &&  ./fnserver.sh
 
 
 ```
