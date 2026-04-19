@@ -16,7 +16,7 @@ echo "  YouTube 頻道：https://www.youtube.com/@Eric-f2v"
 echo -e "${GREEN}=========================================${NC}"
 
 # 1. 基础路径配置
-BASE_DIR="/vol1/1000"
+BASE_DIR="/mnt/mvtv"
 DOCKER_DIR="$BASE_DIR/docker"
 MEDIA_DIR="$BASE_DIR/media"
 
@@ -27,17 +27,16 @@ if [ "$EUID" -ne 0 ]; then
 fi
 
 echo "--- 正在建立所需的目录结构 ---"
-mkdir -p "$DOCKER_DIR"/{jellyfin,jellyseerr,jackett,qbittorrent,sonarr,radarr,bazarr}/config
+mkdir -p "$DOCKER_DIR"/{jellyseerr,sonarr,radarr,bazarr}/config
 mkdir -p "$MEDIA_DIR"/{downloads,movie,tv}
 echo "✅ 目录建立完成！"
 
-# 2. 获取用户 ID
-echo -e "\n--- 获取 PUID 和 PGID ---"
-read -p "请输入 PUID (默认 1000): " PUID
-PUID=${PUID:-1000}
-read -p "请输入 PGID (默认 1001): " PGID
-PGID=${PGID:-1001}
+# 2. 设置权限（使用 root 权限）
+echo -e "\n--- 权限设置 ---"
+PUID=0
+PGID=0
 TZ="Asia/Shanghai"
+echo "✅ 权限设置完成！使用 root 权限 (PUID=0, PGID=0)"
 
 # 3. 部署函数
 deploy_app() {
@@ -61,25 +60,6 @@ deploy_app() {
 
 # --- 各应用配置开始 ---
 
-# Jellyfin (含硬解支持)
-jellyfin_compose="version: '3.5'
-services:
-  jellyfin:
-    image: lscr.io/linuxserver/jellyfin:latest
-    container_name: jellyfin
-    ports:
-      - 8096:8096
-    environment:
-      - PUID=$PUID
-      - PGID=$PGID
-      - TZ=$TZ
-    volumes:
-      - $DOCKER_DIR/jellyfin/config:/config
-      - $MEDIA_DIR:/media
-    devices:
-      - /dev/dri:/dev/dri # 显卡硬解
-    restart: unless-stopped"
-
 # Jellyseerr
 jellyseerr_compose="version: '3.5'
 services:
@@ -93,43 +73,6 @@ services:
       - LOG_LEVEL=debug
     volumes:
       - $DOCKER_DIR/jellyseerr/config:/app/config
-    restart: unless-stopped"
-
-# Jackett
-jackett_compose="version: '3.5'
-services:
-  jackett:
-    image: lscr.io/linuxserver/jackett:latest
-    container_name: jackett
-    ports:
-      - 9117:9117
-    environment:
-      - PUID=$PUID
-      - PGID=$PGID
-      - TZ=$TZ
-    volumes:
-      - $DOCKER_DIR/jackett/config:/config
-      - $MEDIA_DIR/downloads:/downloads
-    restart: unless-stopped"
-
-# qBittorrent
-qbittorrent_compose="version: '3.5'
-services:
-  qbittorrent:
-    image: lscr.io/linuxserver/qbittorrent:latest
-    container_name: qbittorrent
-    ports:
-      - 8080:8080
-      - 6881:6881
-      - 6881:6881/udp
-    environment:
-      - PUID=$PUID
-      - PGID=$PGID
-      - TZ=$TZ
-      - WEBUI_PORT=8080
-    volumes:
-      - $DOCKER_DIR/qbittorrent/config:/config
-      - $MEDIA_DIR:/media
     restart: unless-stopped"
 
 # Sonarr
@@ -184,21 +127,15 @@ services:
     restart: unless-stopped"
 
 # --- 执行部署序列 ---
-deploy_app "jellyfin" "$jellyfin_compose"
 deploy_app "jellyseerr" "$jellyseerr_compose"
-deploy_app "jackett" "$jackett_compose"
-deploy_app "qbittorrent" "$qbittorrent_compose"
 deploy_app "sonarr" "$sonarr_compose"
 deploy_app "radarr" "$radarr_compose"
 deploy_app "bazarr" "$bazarr_compose"
 
 echo -e "\n${GREEN}--- 🎉 所有应用程序部署完成！ ---${NC}"
 echo "请通过 NAS IP 加以下端口访问："
-echo "  - Jellyfin:    8096"
 echo "  - Jellyseerr:  5055"
-echo "  - qBittorrent: 8080"
 echo "  - Sonarr:      8989"
 echo "  - Radarr:      7878"
-echo "  - Jackett:     9117"
 echo "  - Bazarr:      6767"
 echo -e "\n${GREEN}温馨提示：在 Sonarr/Radarr 设置媒体库时，请统一使用 /media 路径以实现硬链接。${NC}"
