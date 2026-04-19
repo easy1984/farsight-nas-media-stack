@@ -167,18 +167,7 @@ services:
     restart: unless-stopped"
 
 # --- 执行部署序列 ---
-deploy_app "jellyseerr" "$jellyseerr_compose"
-deploy_app "sonarr" "$sonarr_compose"
-deploy_app "radarr" "$radarr_compose"
-deploy_app "bazarr" "$bazarr_compose"
-
-echo -e "\n${GREEN}--- 🎉 所有应用程序部署完成！ ---${NC}"
-echo "请通过 NAS IP 加以下端口访问："
-echo "  - Jellyseerr:  5055"
-echo "  - Sonarr:      8989"
-echo "  - Radarr:      7878"
-echo "  - Bazarr:      6767"
-echo -e "\n${GREEN}温馨提示：在 Sonarr/Radarr 设置媒体库时，请统一使用 /media 路径以实现硬链接。${NC}"
+# 注意：默认部署已移至交互式菜单中
 
 # --- 交互式菜单 ---
 echo -e "\n${GREEN}=========================================${NC}"
@@ -199,6 +188,12 @@ case $choice in
     deploy_app "radarr" "$radarr_compose"
     deploy_app "bazarr" "$bazarr_compose"
     echo -e "\n${GREEN}--- 🎉 所有应用部署完成 ---${NC}"
+    echo "请通过 NAS IP 加以下端口访问："
+    echo "  - Jellyseerr:  5055"
+    echo "  - Sonarr:      8989"
+    echo "  - Radarr:      7878"
+    echo "  - Bazarr:      6767"
+    echo -e "\n${GREEN}温馨提示：在 Sonarr/Radarr 设置媒体库时，请统一使用 /media 路径以实现硬链接。${NC}"
     ;;
   2)
     delete_all
