@@ -17,7 +17,7 @@ echo "  YouTube 頻道：https://www.youtube.com/@Eric-f2v"
 echo -e "${GREEN}=========================================${NC}"
 
 # 1. 基础路径配置
-BASE_DIR="/mnt/mvtv"
+BASE_DIR="/mnt/sata1-1/mvtv"
 DOCKER_DIR="$BASE_DIR/docker"
 MEDIA_DIR="$BASE_DIR/media"
 
