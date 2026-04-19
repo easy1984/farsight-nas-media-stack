@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 #====================================================
 # 脚本名称：Eric 的媒体服务器一键部署脚本 (优化版)
@@ -78,9 +78,10 @@ delete_app() {
 
 # 5. 批量删除所有应用
 delete_all() {
-  echo -e "\n${RED}！！！ 警告：即将删除所有部署的应用 ！！！${NC}"
+  echo -e "${RED}！！！ 警告：即将删除所有部署的应用 ！！！${NC}"
   echo -e "${RED}！！！ 这将删除所有容器、数据卷和配置文件 ！！！${NC}"
-  read -p "确认删除？(y/N): " confirm
+  echo -n "确认删除？(y/N): "
+  read confirm
   confirm=${confirm:-N}
   
   if [ "$confirm" != "y" ] && [ "$confirm" != "Y" ]; then
@@ -178,7 +179,8 @@ echo "  3. 仅部署指定应用"
 echo "  4. 仅删除指定应用"
 echo "  0. 退出"
 echo -e "${GREEN}=========================================${NC}"
-read -p "请输入选项 (0-4): " choice
+echo -n "请输入选项 (0-4): "
+read choice
 
 case $choice in
   1)
@@ -200,7 +202,8 @@ case $choice in
     ;;
   3)
     echo -e "\n${GREEN}--- 单独部署 ---${NC}"
-    read -p "输入要部署的应用名称（多个用空格分隔）: " apps
+    echo -n "输入要部署的应用名称（多个用空格分隔）: "
+    read apps
     for app in $apps; do
       case $app in
         jellyseerr) deploy_app "jellyseerr" "$jellyseerr_compose" ;;
@@ -213,7 +216,8 @@ case $choice in
     ;;
   4)
     echo -e "\n${GREEN}--- 单独删除 ---${NC}"
-    read -p "输入要删除的应用名称（多个用空格分隔）: " apps
+    echo -n "输入要删除的应用名称（多个用空格分隔）: "
+    read apps
     for app in $apps; do
       delete_app "$app"
     done
