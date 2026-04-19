@@ -31,7 +31,8 @@
 
 ```bash
 
-curl -fsSL https://raw.githubusercontent.com/easy/farsight-nas-media-stack/main/fnserver.sh -o fnserver.sh && chmod +x fnserver.sh &&  ./fnserver.sh
+curl -fsSL https://raw.githubusercontent.com/easy1984/farsight-nas-media-stack/refs/heads/main/fnserver.sh -o fnserver.sh && chmod +x fnserver.sh && ./fnserver.sh
+
 
 ```
 
