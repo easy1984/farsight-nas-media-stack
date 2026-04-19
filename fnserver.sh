@@ -17,7 +17,7 @@ echo "  YouTube 頻道：https://www.youtube.com/@Eric-f2v"
 echo -e "${GREEN}=========================================${NC}"
 
 # 1. 基础路径配置
-BASE_DIR="/mnt/sata1-1/mvtv"
+BASE_DIR="/mnt/mvtv"
 DOCKER_DIR="$BASE_DIR/docker"
 MEDIA_DIR="$BASE_DIR/media"
 
@@ -86,7 +86,7 @@ delete_all() {
   
   if [ "$confirm" != "y" ] && [ "$confirm" != "Y" ]; then
     echo "取消删除操作"
-    exit 0
+    return 0
   fi
   
   echo -e "\n${RED}--- 开始删除所有应用 ---${NC}"
@@ -171,63 +171,64 @@ services:
 # 注意：默认部署已移至交互式菜单中
 
 # --- 交互式菜单 ---
-echo -e "\n${GREEN}=========================================${NC}"
-echo "  请选择操作："
-echo "  1. 部署所有应用"
-echo "  2. 删除所有应用"
-echo "  3. 仅部署指定应用"
-echo "  4. 仅删除指定应用"
-echo "  0. 退出"
-echo -e "${GREEN}=========================================${NC}"
-echo -n "请输入选项 (0-4): "
-read choice
-
-case $choice in
-  1)
-    echo -e "\n${GREEN}--- 开始部署所有应用 ---${NC}"
-    deploy_app "jellyseerr" "$jellyseerr_compose"
-    deploy_app "sonarr" "$sonarr_compose"
-    deploy_app "radarr" "$radarr_compose"
-    deploy_app "bazarr" "$bazarr_compose"
-    echo -e "\n${GREEN}--- 🎉 所有应用部署完成 ---${NC}"
-    echo "请通过 NAS IP 加以下端口访问："
-    echo "  - Jellyseerr:  5055"
-    echo "  - Sonarr:      8989"
-    echo "  - Radarr:      7878"
-    echo "  - Bazarr:      6767"
-    echo -e "\n${GREEN}温馨提示：在 Sonarr/Radarr 设置媒体库时，请统一使用 /media 路径以实现硬链接。${NC}"
-    ;;
-  2)
-    delete_all
-    ;;
-  3)
-    echo -e "\n${GREEN}--- 单独部署 ---${NC}"
-    echo -n "输入要部署的应用名称（多个用空格分隔）: "
-    read apps
-    for app in $apps; do
-      case $app in
-        jellyseerr) deploy_app "jellyseerr" "$jellyseerr_compose" ;;
-        sonarr) deploy_app "sonarr" "$sonarr_compose" ;;
-        radarr) deploy_app "radarr" "$radarr_compose" ;;
-        bazarr) deploy_app "bazarr" "$bazarr_compose" ;;
-        *) echo -e "${RED}未知应用: $app${NC}" ;;
-      esac
-    done
-    ;;
-  4)
-    echo -e "\n${GREEN}--- 单独删除 ---${NC}"
-    echo -n "输入要删除的应用名称（多个用空格分隔）: "
-    read apps
-    for app in $apps; do
-      delete_app "$app"
-    done
-    ;;
-  0)
-    echo "退出脚本"
-    exit 0
-    ;;
-  *)
-    echo -e "${RED}无效选项${NC}"
-    exit 1
-    ;;
-esac
+while true; do
+  echo -e "\n${GREEN}=========================================${NC}"
+  echo "  请选择操作："
+  echo "  1. 部署所有应用"
+  echo "  2. 删除所有应用"
+  echo "  3. 仅部署指定应用"
+  echo "  4. 仅删除指定应用"
+  echo "  0. 退出"
+  echo -e "${GREEN}=========================================${NC}"
+  echo -n "请输入选项 (0-4): "
+  read choice
+  
+  case $choice in
+    1)
+      echo -e "\n${GREEN}--- 开始部署所有应用 ---${NC}"
+      deploy_app "jellyseerr" "$jellyseerr_compose"
+      deploy_app "sonarr" "$sonarr_compose"
+      deploy_app "radarr" "$radarr_compose"
+      deploy_app "bazarr" "$bazarr_compose"
+      echo -e "\n${GREEN}--- 🎉 所有应用部署完成 ---${NC}"
+      echo "请通过 NAS IP 加以下端口访问："
+      echo "  - Jellyseerr:  5055"
+      echo "  - Sonarr:      8989"
+      echo "  - Radarr:      7878"
+      echo "  - Bazarr:      6767"
+      echo -e "\n${GREEN}温馨提示：在 Sonarr/Radarr 设置媒体库时，请统一使用 /media 路径以实现硬链接。${NC}"
+      ;;
+    2)
+      delete_all
+      ;;
+    3)
+      echo -e "\n${GREEN}--- 单独部署 ---${NC}"
+      echo -n "输入要部署的应用名称（多个用空格分隔）: "
+      read apps
+      for app in $apps; do
+        case $app in
+          jellyseerr) deploy_app "jellyseerr" "$jellyseerr_compose" ;;
+          sonarr) deploy_app "sonarr" "$sonarr_compose" ;;
+          radarr) deploy_app "radarr" "$radarr_compose" ;;
+          bazarr) deploy_app "bazarr" "$bazarr_compose" ;;
+          *) echo -e "${RED}未知应用: $app${NC}" ;;
+        esac
+      done
+      ;;
+    4)
+      echo -e "\n${GREEN}--- 单独删除 ---${NC}"
+      echo -n "输入要删除的应用名称（多个用空格分隔）: "
+      read apps
+      for app in $apps; do
+        delete_app "$app"
+      done
+      ;;
+    0)
+      echo "退出脚本"
+      exit 0
+      ;;
+    *)
+      echo -e "${RED}无效选项，请重新输入${NC}"
+      ;;
+  esac
+done
