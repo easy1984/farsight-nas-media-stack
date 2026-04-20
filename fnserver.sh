@@ -127,7 +127,6 @@ services:
       - TZ=$TZ
     volumes:
       - $DOCKER_DIR/sonarr/config:/config
-      - $MEDIA_DIR:/media
     restart: unless-stopped"
 
 # Radarr
@@ -144,7 +143,6 @@ services:
       - TZ=$TZ
     volumes:
       - $DOCKER_DIR/radarr/config:/config
-      - $MEDIA_DIR:/media
     restart: unless-stopped"
 
 # --- 交互式菜单 ---
