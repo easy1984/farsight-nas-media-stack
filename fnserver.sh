@@ -29,7 +29,6 @@ fi
 
 echo "--- 正在建立所需的目录结构 ---"
 mkdir -p "$DOCKER_DIR"/{jellyseerr,sonarr,radarr}/config
-mkdir -p "$MEDIA_DIR"/{downloads,movie,tv}
 echo "✅ 目录建立完成！"
 
 # 2. 设置权限（使用 root 权限）
