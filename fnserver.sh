@@ -29,6 +29,7 @@ fi
 
 echo "--- 正在建立所需的目录结构 ---"
 mkdir -p "$DOCKER_DIR"/{jellyseerr,sonarr,radarr}/config
+mkdir -p "$MEDIA_DIR"/{downloads,movie,tv}
 echo "✅ 目录建立完成！"
 
 # 2. 设置权限（使用 root 权限）
@@ -146,52 +147,65 @@ services:
     restart: unless-stopped"
 
 # --- 交互式菜单 ---
-echo -e "\n${GREEN}=========================================${NC}"
-echo "  请选择操作："
-echo "  1. 部署所有应用"
-echo "  2. 删除所有应用"
-echo "  3. 仅部署指定应用"
-echo "  4. 仅删除指定应用"
-echo "  0. 退出"
-echo -e "${GREEN}=========================================${NC}"
-read -p "请输入选项 (0-4): " choice
+while true; do
+  echo -e "\n${GREEN}=========================================${NC}"
+  echo "  请选择操作："
+  echo "  1. 部署所有应用"
+  echo "  2. 删除所有应用"
+  echo "  3. 仅部署指定应用"
+  echo "  4. 仅删除指定应用"
+  echo "  0. 退出"
+  echo -e "${GREEN}=========================================${NC}"
+  read -p "请输入选项 (0-4): " choice
 
-case $choice in
-  1)
-    echo -e "\n${GREEN}--- 开始部署所有应用 ---${NC}"
-    deploy_app "jellyseerr" "$jellyseerr_compose"
-    deploy_app "sonarr" "$sonarr_compose"
-    deploy_app "radarr" "$radarr_compose"
-    echo -e "\n${GREEN}--- 🎉 所有应用部署完成 ---${NC}"
-    ;;
-  2)
-    delete_all
-    ;;
-  3)
-    echo -e "\n${GREEN}--- 单独部署 ---${NC}"
-    read -p "输入要部署的应用名称（多个用空格分隔）: " apps
-    for app in $apps; do
-      case $app in
-        jellyseerr) deploy_app "jellyseerr" "$jellyseerr_compose" ;;
-        sonarr) deploy_app "sonarr" "$sonarr_compose" ;;
-        radarr) deploy_app "radarr" "$radarr_compose" ;;
-        *) echo -e "${RED}未知应用: $app${NC}" ;;
-      esac
-    done
-    ;;
-  4)
-    echo -e "\n${GREEN}--- 单独删除 ---${NC}"
-    read -p "输入要删除的应用名称（多个用空格分隔）: " apps
-    for app in $apps; do
-      delete_app "$app"
-    done
-    ;;
-  0)
-    echo "退出脚本"
-    exit 0
-    ;;
-  *)
-    echo -e "${RED}无效选项${NC}"
-    exit 1
-    ;;
-esac
+  case $choice in
+    1)
+      echo -e "\n${GREEN}--- 开始部署所有应用 ---${NC}"
+      deploy_app "jellyseerr" "$jellyseerr_compose"
+      deploy_app "sonarr" "$sonarr_compose"
+      deploy_app "radarr" "$radarr_compose"
+      echo -e "\n${GREEN}--- 🎉 所有应用部署完成 ---${NC}"
+      echo "请通过 NAS IP 加以下端口访问："
+      echo "  - Jellyseerr:  5055"
+      echo "  - Sonarr:      8989"
+      echo "  - Radarr:      7878"
+      ;;
+    2)
+      delete_all
+      ;;
+    3)
+      echo -e "\n${GREEN}--- 单独部署 ---${NC}"
+      read -p "输入要部署的应用名称（多个用空格分隔）: " apps
+      if [ -n "$apps" ]; then
+        for app in $apps; do
+          case $app in
+            jellyseerr) deploy_app "jellyseerr" "$jellyseerr_compose" ;;
+            sonarr) deploy_app "sonarr" "$sonarr_compose" ;;
+            radarr) deploy_app "radarr" "$radarr_compose" ;;
+            *) echo -e "${RED}未知应用: $app${NC}" ;;
+          esac
+        done
+      else
+        echo -e "${YELLOW}未输入任何应用名称${NC}"
+      fi
+      ;;
+    4)
+      echo -e "\n${GREEN}--- 单独删除 ---${NC}"
+      read -p "输入要删除的应用名称（多个用空格分隔）: " apps
+      if [ -n "$apps" ]; then
+        for app in $apps; do
+          delete_app "$app"
+        done
+      else
+        echo -e "${YELLOW}未输入任何应用名称${NC}"
+      fi
+      ;;
+    0)
+      echo "退出脚本"
+      exit 0
+      ;;
+    *)
+      echo -e "${RED}无效选项，请输入 0-4${NC}"
+      ;;
+  esac
+done
