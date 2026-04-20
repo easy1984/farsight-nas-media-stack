@@ -28,7 +28,7 @@ if [ "$EUID" -ne 0 ]; then
 fi
 
 echo "--- 正在建立所需的目录结构 ---"
-mkdir -p "$DOCKER_DIR"/{jellyseerr,sonarr,radarr,bazarr}/config
+mkdir -p "$DOCKER_DIR"/{jellyseerr,sonarr,radarr}/config
 mkdir -p "$MEDIA_DIR"/{downloads,movie,tv}
 echo "✅ 目录建立完成！"
 
@@ -92,7 +92,6 @@ delete_all() {
   delete_app "jellyseerr"
   delete_app "sonarr"
   delete_app "radarr"
-  delete_app "bazarr"
   
   echo -e "\n${GREEN}--- 🗑️  所有应用已删除 ---${NC}"
   echo "如需清理持久化数据，请手动删除 $DOCKER_DIR 和 $MEDIA_DIR 目录"
@@ -149,37 +148,6 @@ services:
       - $MEDIA_DIR:/media
     restart: unless-stopped"
 
-# Bazarr
-bazarr_compose="version: '3.5'
-services:
-  bazarr:
-    image: lscr.io/linuxserver/bazarr:latest
-    container_name: bazarr
-    ports:
-      - 6767:6767
-    environment:
-      - PUID=$PUID
-      - PGID=$PGID
-      - TZ=$TZ
-    volumes:
-      - $DOCKER_DIR/bazarr/config:/config
-      - $MEDIA_DIR:/media
-    restart: unless-stopped"
-
-# --- 执行部署序列 ---
-deploy_app "jellyseerr" "$jellyseerr_compose"
-deploy_app "sonarr" "$sonarr_compose"
-deploy_app "radarr" "$radarr_compose"
-deploy_app "bazarr" "$bazarr_compose"
-
-echo -e "\n${GREEN}--- 🎉 所有应用程序部署完成！ ---${NC}"
-echo "请通过 NAS IP 加以下端口访问："
-echo "  - Jellyseerr:  5055"
-echo "  - Sonarr:      8989"
-echo "  - Radarr:      7878"
-echo "  - Bazarr:      6767"
-echo -e "\n${GREEN}温馨提示：在 Sonarr/Radarr 设置媒体库时，请统一使用 /media 路径以实现硬链接。${NC}"
-
 # --- 交互式菜单 ---
 echo -e "\n${GREEN}=========================================${NC}"
 echo "  请选择操作："
@@ -197,7 +165,6 @@ case $choice in
     deploy_app "jellyseerr" "$jellyseerr_compose"
     deploy_app "sonarr" "$sonarr_compose"
     deploy_app "radarr" "$radarr_compose"
-    deploy_app "bazarr" "$bazarr_compose"
     echo -e "\n${GREEN}--- 🎉 所有应用部署完成 ---${NC}"
     ;;
   2)
@@ -211,7 +178,6 @@ case $choice in
         jellyseerr) deploy_app "jellyseerr" "$jellyseerr_compose" ;;
         sonarr) deploy_app "sonarr" "$sonarr_compose" ;;
         radarr) deploy_app "radarr" "$radarr_compose" ;;
-        bazarr) deploy_app "bazarr" "$bazarr_compose" ;;
         *) echo -e "${RED}未知应用: $app${NC}" ;;
       esac
     done
